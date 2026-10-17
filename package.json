@@ -1,0 +1,63 @@
+{
+  "name": "dsh-manual-bg",
+  "version": "0.1.0",
+  "description": "Manual background promotion for DeepSeek Harness shell commands: a `run` shell tool whose conversation card carries a small SVG button that moves the running command to a background job.",
+  "type": "module",
+  "main": "lib/index.js",
+  "license": "MIT",
+  "author": "nu0y4",
+  "keywords": [
+    "deepseek-harness",
+    "dsh-plugin",
+    "background",
+    "shell",
+    "tool-view",
+    "promote"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nu0y4/dsh-manual-bg.git"
+  },
+  "homepage": "https://github.com/nu0y4/dsh-manual-bg#readme",
+  "bugs": {
+    "url": "https://github.com/nu0y4/dsh-manual-bg/issues"
+  },
+  "files": [
+    "lib/",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "scripts/",
+    "test/"
+  ],
+  "scripts": {
+    "test": "node test/host-service.test.mjs && node test/client-view.test.mjs",
+    "gen:all-modes": "node scripts/gen-all-modes-patch.mjs"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./tool": "./lib/tool.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": ["@deepseek-ai/dsh-client-ui-tool"],
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/schemastery": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-llm": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-sandbox": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-shell": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
