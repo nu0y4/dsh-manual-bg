@@ -7,9 +7,11 @@ DSH 的 `jobs` 服务只有 start / list / read / kill，没有「接管进行�
 
 - 一个 `run` 工具（改造自官方 `@deepseek-ai/dsh-tool-pwsh`，sandbox / jobs / 超时语义保持一致）；
 - 前台等待时同时竞速「命令跑完」和「用户点按钮」；
-- Web 对话里只渲染**一行**：命令行 + 行尾 **↩ 图标按钮**（无文字、不展开、不输出块）；
-- 点 ↘ 图标 → host 唤醒该调用的等待器 → 工具立刻返回 `[moved to background job <id>]`，
+- Web 对话里默认只渲染**一行**：命令行 + 行尾 **↩ 图标按钮**（无文字、无展开的内容块）；
+- **点击这一行**可展开/收起预览（完整命令 + 输出），和原生命令卡片的点击预览一致；
+- 点行尾 ↩ 图标 → host 唤醒该调用的等待器 → 工具立刻返回 `[moved to background job <id>]`，
   命令继续在后台跑，agent 马上能继续下一步；跑完有完成通知，输出可用 `job_output` 读、`job_kill` 停。
+  （点图标不会触发行展开：按钮自己 `stopPropagation`。）
 
 ## 适用平台
 
@@ -105,10 +107,12 @@ dsh web --patch <...>\lan-access.patch.yml --patch <...>\all-modes.patch.yml --n
   `Promise.race([registry.wait(...), promotePromise])`；按钮命中时返回
   `kind: "promoted"`（`timeoutMs: 0` 作为手动标记），job 继续跑。
 - **client**（`lib/client.js`）：手写 DSH ModuleLoader bundle，注册
-  `tool.call.toolview`（key=`run`），渲染单行折叠卡片。
+  `tool.call.toolview`（key=`run`），默认单行折叠、整行可点击展开预览。
 
 ## 行为与边界
 
+- 折叠时只显示命令首行；点击行（或聚焦后按 Enter）展开完整命令 + 输出预览，再点收起。
+- 行尾 ↩ 图标只在命令运行中出现；点击只做「转后台」，不会触发行展开。
 - 按钮只对本插件提供的 `run` 工具生效（原生 `pwsh`/`bash` 卡片没有按钮）。
 - 失败安全：host 服务不可用时，工具行为退化为官方 pwsh 工具（不会崩）。
 - `/manual-bg/promote` 只接受 `{callId}`，只做「把已登记的前台等待转后台」，
